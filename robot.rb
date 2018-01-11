@@ -1,5 +1,5 @@
 class Robot
-  
+
   NORTH = "north"
   SOUTH = "south"
   EAST = "east"
@@ -12,9 +12,10 @@ class Robot
   def initialize(x, y, direction)
     @positions = [ {x: x, y: y} ]
     @direction = direction
+    calculate_adjacent_positions
   end
 
-  def get_adjacent_positions
+  def calculate_adjacent_positions
     current_position = @positions.last
     left = {x: current_position[:x]-1, y: current_position[:y]}
     right = {x: current_position[:x]+1, y: current_position[:y]}
@@ -23,8 +24,12 @@ class Robot
     @adjacent_positions = {left: left, front: front, right: right, back: back}
   end
 
-  def get_location
-    [@positions.last[:x], @positions.last[:y]]
+  def get_position
+    @positions.last
+  end
+
+  def get_adjacent_positions
+    @adjacent_positions
   end
 
   def get_direction
@@ -32,7 +37,7 @@ class Robot
   end
 
   def turn_right
-      @direction = RIGHT[@direction]
+    @direction = RIGHT[@direction]
   end
 
   def turn_left
@@ -40,25 +45,29 @@ class Robot
   end
 
   def move_forward
-    current_position = @positions.last
-    case @direction
-      when :NORTH
-        @positions.push({x: current_position[:x], y: current_position[:y]-1})
-      when :EAST
-        @positions.push({x: current_position[:x]+1, y: current_position[:y]})
-      when :SOUTH
-        @positions.push({x: current_position[:x], y: current_position[:y]+1})
-      when :WEST
-        @positions.push({x: current_position[:x]-1, y: current_position[:y]})
-    end
-    get_location
+    @positions.push(@adjacent_positions[:front])
+    calculate_adjacent_positions
+    get_position
   end
 
   def move_back
-    current_position_index = @positions.count
-    previous_position = @positions[current_position_index-2]
-    @positions.push({x: previous_position[:x], y: previous_position[:y]})
-    get_location
+    @positions.push(@adjacent_positions[:back])
+    calculate_adjacent_positions
+    get_position
   end
+
+  def move_left
+    @positions.push(@adjacent_positions[:left])
+    calculate_adjacent_positions
+    get_position
+  end
+  
+  def move_right
+    @positions.push(@adjacent_positions[:right])
+    calculate_adjacent_positions
+    get_position
+  end
+
+
 
 end
