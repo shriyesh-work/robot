@@ -34,7 +34,7 @@ class RobotTest < Minitest::Test
     assert_equal expected_position, @robot.move_backward
   end
 
-  def test_robots_adjacent_positions
+  def test_robots_adjacent_positions_when_facing_north
     expected_positions = {front: { x: 2, y: 3}, right: { x: 3, y: 4}, back: { x: 2, y: 5}, left: { x: 1, y: 4}}
     assert_equal expected_positions, @robot.get_adjacent_positions
   end
@@ -67,8 +67,86 @@ class RobotTest < Minitest::Test
     @robot.move_forward
     @robot.move_backward
     @robot.move_left
-    expected_positions_history = [{x: 2, y: 4}, {x: 2, y: 3}, {x: 1, y: 3}, {x: 2, y: 3}, {x: 2, y: 4}]
+    expected_positions_history = [{x: 2, y: 4, instruction: nil }, {x: 2, y: 3, instruction: "move_forward"}, {x: 2, y: 3, instruction: "turn_left"}, {x: 1, y: 3, instruction: "move_forward"}, {x: 2, y: 3, instruction: "move_backward"}, {x: 2, y: 4, instruction: "move_left"}]
     assert_equal expected_positions_history, @robot.get_position_history
   end
 
+  def test_robot_turns_back
+    assert_equal :SOUTH, @robot.turn_back 
+  end
+
+  def test_robots_adjacent_positions_when_facing_south
+    @robot.turn_back
+    expected_positions = {front: { x: 2, y: 5}, right: { x: 1, y: 4}, back: { x: 2, y: 3}, left: { x: 3, y: 4}}
+    assert_equal expected_positions, @robot.get_adjacent_positions
+  end
+
+  def test_robots_adjacent_positions_when_facing_east
+    @robot.turn_right
+    expected_positions = {left: { x: 2, y: 3}, front: { x: 3, y: 4}, right: { x: 2, y: 5}, back: { x: 1, y: 4}}
+    assert_equal expected_positions, @robot.get_adjacent_positions
+  end
+
+  def test_robots_adjacent_positions_when_facing_west
+    @robot.turn_left
+    expected_positions = {right: { x: 2, y: 3}, back: { x: 3, y: 4}, left: { x: 2, y: 5}, front: { x: 1, y: 4}}
+    assert_equal expected_positions, @robot.get_adjacent_positions
+  end
+
+  def test_robot_does_not_have_a_plateau
+    refute @robot.has_plateau? 
+  end
+
+  def test_robot_is_placed_on_plateau
+    plateau = Plateau.new(5, 5)
+    assert @robot.place_robot(plateau)
+  end
+
+  def test_robot_has_a_plateau
+    plateau = Plateau.new(5, 5)
+    @robot.place_robot(plateau)
+    assert @robot.has_plateau? 
+  end
+
+  def test_robot_exceeds_plateau_x_dimension
+    plateau = Plateau.new(5, 5)
+    @robot.place_robot(plateau)
+    assert_equal true, @robot.exceed_plateau(6,4)
+  end
+
+  def test_robot_exceeds_plateau_y_dimension
+    plateau = Plateau.new(5, 5)
+    @robot.place_robot(plateau)
+    assert_equal true, @robot.exceed_plateau(2,6)
+  end
+
+  def test_robot_exceeds_plateau_x_and_y_dimension
+    plateau = Plateau.new(5, 5)
+    @robot.place_robot(plateau)
+    assert_equal true, @robot.exceed_plateau(6,6)
+  end
+
+    def test_robot_preceeds_plateau_x_dimension
+    plateau = Plateau.new(5, 5)
+    @robot.place_robot(plateau)
+    assert_equal true, @robot.exceed_plateau(-6,4)
+  end
+
+  def test_robot_preceeds_plateau_y_dimension
+    plateau = Plateau.new(5, 5)
+    @robot.place_robot(plateau)
+    assert_equal true, @robot.exceed_plateau(2,-6)
+  end
+
+  def test_robot_preceeds_plateau_x_and_y_dimension
+    plateau = Plateau.new(5, 5)
+    @robot.place_robot(plateau)
+    assert_equal true, @robot.exceed_plateau(-6,-6)
+  end
+
+  def test_robot_doesnt_exceed_plateau_dimensions
+    plateau = Plateau.new(5, 5)
+    @robot.place_robot(plateau)
+    assert_equal false, @robot.exceed_plateau(2,4)
+  end
 end
