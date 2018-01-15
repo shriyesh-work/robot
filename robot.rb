@@ -17,6 +17,7 @@ end
 
 class Robot
   attr_accessor :direction, :positions, :adjacent_positions
+
   NORTH = "north"
   SOUTH = "south"
   EAST = "east"
@@ -33,30 +34,46 @@ class Robot
   end
 
   def calculate_adjacent_positions
-    current_position = @positions.last
+    #current_position = @positions.last
     case @direction
     when :NORTH 
-      front = {x: current_position.x, y: current_position.y-1}
-      back = {x: current_position.x, y: current_position.y+1}
-      left = {x: current_position.x-1, y: current_position.y}
-      right = {x: current_position.x+1, y: current_position.y} 
+      front = x_y_minus_1                           #{x: current_position.x, y: current_position.y-1}
+      back = x_y_plus_1                             #{x: current_position.x, y: current_position.y+1}
+      left = x_minus_1_y                            #{x: current_position.x-1, y: current_position.y}
+      right = x_plus_1_y                            #{x: current_position.x+1, y: current_position.y} 
     when :EAST
-      front = {x: current_position.x+1, y: current_position.y}
-      back = {x: current_position.x-1, y: current_position.y}
-      left = {x: current_position.x, y: current_position.y-1}
-      right = {x: current_position.x, y: current_position.y+1} 
+      front = x_plus_1_y                            #{x: current_position.x+1, y: current_position.y}
+      back = x_minus_1_y                            #{x: current_position.x-1, y: current_position.y}
+      left = x_y_minus_1                            #{x: current_position.x, y: current_position.y-1}
+      right = x_y_plus_1                            #{x: current_position.x, y: current_position.y+1} 
     when :SOUTH
-      front = {x: current_position.x, y: current_position.y+1}
-      back = {x: current_position.x, y: current_position.y-1}
-      left = {x: current_position.x+1, y: current_position.y}
-      right = {x: current_position.x-1, y: current_position.y} 
+      front = x_y_plus_1                            #{x: current_position.x, y: current_position.y+1}
+      back = x_y_minus_1                            #{x: current_position.x, y: current_position.y-1}
+      left = x_plus_1_y                             #{x: current_position.x+1, y: current_position.y}
+      right = x_minus_1_y                           #{x: current_position.x-1, y: current_position.y} 
     when :WEST
-      front = {x: current_position.x-1, y: current_position.y}
-      back = {x: current_position.x+1, y: current_position.y}
-      left = {x: current_position.x, y: current_position.y+1}
-      right = {x: current_position.x, y: current_position.y-1} 
+      front = x_minus_1_y                           #{x: current_position.x-1, y: current_position.y}
+      back = x_plus_1_y                             #{x: current_position.x+1, y: current_position.y}
+      left = x_y_plus_1                             #{x: current_position.x, y: current_position.y+1}
+      right = x_y_minus_1                           #{x: current_position.x, y: current_position.y-1} 
     end
     @adjacent_positions = {front: front, right: right, back: back, left: left}
+  end
+
+  def x_y_minus_1
+    {x: @positions.last.x, y: @positions.last.y-1}
+  end
+
+  def x_y_plus_1
+    {x: @positions.last.x, y: @positions.last.y+1}
+  end
+
+  def x_minus_1_y
+    {x: @positions.last.x-1, y: @positions.last.y}
+  end
+
+  def x_plus_1_y
+    {x: @positions.last.x+1, y: @positions.last.y}
   end
 
   def get_position
@@ -72,48 +89,47 @@ class Robot
   end
 
   def turn_right
-    @direction = RIGHT[@direction]
-    calculate_adjacent_positions
-    new_position = Coordinate.new(@positions.last.x, @positions.last.y, "turn_right")
-    @positions.push(new_position)
-    @direction
+    turn(RIGHT[@direction], "turn_right")
   end
 
 
   def turn_left
-    @direction = LEFT[@direction]
+    turn(LEFT[@direction], "turn_left")
+  end
+
+  def turn(direction, instruction)
+    @direction = direction
     calculate_adjacent_positions
-    new_position = Coordinate.new(@positions.last.x, @positions.last.y, "turn_left")
+    new_position = Coordinate.new(@positions.last.x, @positions.last.y, instruction)
     @positions.push(new_position)
     @direction
   end
 
   def move_forward
-    new_position = Coordinate.new(@adjacent_positions[:front][:x], @adjacent_positions[:front][:y], "move_forward")
-    @positions.push(new_position)
-    calculate_adjacent_positions
-    get_position
+    move(:front, "move_forward")
   end
 
   def move_backward
-    new_position = Coordinate.new(@adjacent_positions[:back][:x], @adjacent_positions[:back][:y], "move_backward")
-    @positions.push(new_position)
-    calculate_adjacent_positions
-    get_position
+    move(:back, "move_backward")
   end
 
   def move_left
-    new_position = Coordinate.new(@adjacent_positions[:left][:x], @adjacent_positions[:left][:y], "move_left")
-    @positions.push(new_position)
-    calculate_adjacent_positions
-    get_position
+   move(:left, "move_left")
   end
 
   def move_right
-    new_position = Coordinate.new(@adjacent_positions[:right][:x], @adjacent_positions[:right][:y], "move_right")
-    @positions.push(new_position)
-    calculate_adjacent_positions
-    get_position
+    move(:right, "move_right")
+  end
+
+  def move(adjacency, instruction)
+    if has_plateau?
+      new_position = Coordinate.new(@adjacent_positions[adjacency][:x], @adjacent_positions[adjacency][:y], instruction)
+      @positions.push(new_position)
+      calculate_adjacent_positions
+      get_position
+    else
+      "There is no plateau, couldnt move!"
+    end
   end
 
   def get_position_history
@@ -151,17 +167,31 @@ class Robot
       true
     end
   end
-    
-  #     if x > @plateau.dimension_x || y > @plateau.dimension_y 
-  #       true
-  #     elsif x < @plateau.dimension_x || y < @plateau.dimension_y
-  #       true
-  #     else
-  #       false
-  #     end
-    
-    
-  # end
-=begin
-=end
+
+  def execute(commands)
+    count = 0
+    commands.scan(/../).each do |command|
+      case command
+      when "TL"
+        turn_left
+      when "TR"
+        turn_right
+      when "MF"
+        move_forward
+      when "MB"
+        move_backward
+      when "ML"
+        move_left
+      when "MR"
+        move_right
+      when "TB"
+        turn_back
+      else
+        break
+      end
+      count += 1
+    end
+    commands.slice(0, count*2)
+  end
+  
 end

@@ -4,6 +4,8 @@ class RobotTest < Minitest::Test
 
   def setup
     @robot = Robot.new(2, 4, :NORTH)
+    @plateau = Plateau.new(5, 5)
+    @robot.place_robot(@plateau)
   end
 
   def test_robot_is_placed_at_given_loaction
@@ -93,60 +95,69 @@ class RobotTest < Minitest::Test
     assert_equal expected_positions, @robot.get_adjacent_positions
   end
 
-  def test_robot_does_not_have_a_plateau
-    refute @robot.has_plateau? 
-  end
+  # def test_robot_does_not_have_a_plateau
+  #   refute @robot.has_plateau? 
+  # end
 
   def test_robot_is_placed_on_plateau
-    plateau = Plateau.new(5, 5)
-    assert @robot.place_robot(plateau)
+    assert @robot.place_robot(@plateau)
   end
 
   def test_robot_has_a_plateau
-    plateau = Plateau.new(5, 5)
-    @robot.place_robot(plateau)
     assert @robot.has_plateau? 
   end
 
   def test_robot_exceeds_plateau_x_dimension
-    plateau = Plateau.new(5, 5)
-    @robot.place_robot(plateau)
     assert_equal true, @robot.exceed_plateau(6,4)
   end
 
   def test_robot_exceeds_plateau_y_dimension
-    plateau = Plateau.new(5, 5)
-    @robot.place_robot(plateau)
     assert_equal true, @robot.exceed_plateau(2,6)
   end
 
   def test_robot_exceeds_plateau_x_and_y_dimension
-    plateau = Plateau.new(5, 5)
-    @robot.place_robot(plateau)
     assert_equal true, @robot.exceed_plateau(6,6)
   end
 
-    def test_robot_preceeds_plateau_x_dimension
-    plateau = Plateau.new(5, 5)
-    @robot.place_robot(plateau)
+  def test_robot_preceeds_plateau_x_dimension
     assert_equal true, @robot.exceed_plateau(-6,4)
   end
 
   def test_robot_preceeds_plateau_y_dimension
-    plateau = Plateau.new(5, 5)
-    @robot.place_robot(plateau)
     assert_equal true, @robot.exceed_plateau(2,-6)
   end
 
   def test_robot_preceeds_plateau_x_and_y_dimension
-    plateau = Plateau.new(5, 5)
-    @robot.place_robot(plateau)
     assert_equal true, @robot.exceed_plateau(-6,-6)
   end
 
   def test_robot_doesnt_exceed_plateau_dimensions
-    plateau = Plateau.new(5, 5)
-    @robot.place_robot(plateau)
     assert_equal false, @robot.exceed_plateau(2,4)
   end
+
+  def test_robot_cannot_move_forward_without_plateau
+    @robot.place_robot(nil)
+    assert_equal "There is no plateau, couldnt move!", @robot.move_forward
+  end
+
+  def test_robot_cannot_move_backward_without_plateau
+    @robot.place_robot(nil)
+    assert_equal "There is no plateau, couldnt move!", @robot.move_backward 
+  end
+
+  def test_robot_cannot_move_left_without_plateau
+    @robot.place_robot(nil)
+    assert_equal "There is no plateau, couldnt move!", @robot.move_left
+  end
+
+  def test_robot_cannot_move_right_without_plateau
+    @robot.place_robot(nil)
+    assert_equal "There is no plateau, couldnt move!", @robot.move_right
+  end
+
+  def test_robot_executes_given_commands
+    expected_commands = "MFTLMF" #MC is invalid command
+    assert_equal expected_commands, @robot.execute("MFTLMFMCML")
+  end
+
 end
