@@ -16,9 +16,9 @@ class MyRobot
     @position = @direction.move(@position)
   end
 
-  def to_s
-    "#{@position} --- #{@direction}"
-  end
+  # def to_s
+  #   "#{@position} --- #{@direction}"
+  # end
 end
 
 class Position
@@ -43,6 +43,10 @@ class Position
     Position.new(@x+1,@y)
   end
 
+  def get_coordinates
+    [@x, @y]
+  end
+
 end
 
 module Direction
@@ -60,9 +64,6 @@ module Direction
       current_postition.above
     end
 
-    def to_s
-      "N"
-    end
   end
 
   class South
@@ -88,8 +89,8 @@ module Direction
       SOUTH
     end
 
-    def move
-      current
+    def move current_postition
+      current_postition.right
     end
   end
 
@@ -106,9 +107,6 @@ module Direction
       current_postition.left
     end
 
-    def to_s
-      "W"      
-    end
   end
 
   NORTH = North.new
@@ -117,7 +115,7 @@ module Direction
   WEST = West.new
 end
 
-my_robot = MyRobot.new(Position.new(1,1), Direction::NORTH)
-my_robot.turn_left
-my_robot.move
-puts my_robot
+# my_robot = MyRobot.new(Position.new(1,1), Direction::NORTH)
+# my_robot.turn_left
+# my_robot.move
+# puts my_robot
