@@ -6,14 +6,7 @@ class Plateau
   end 
 end
 
-class Coordinate
-  attr_accessor :x, :y, :instruction
-  def initialize(x = 0, y = 0, instruction = nil)
-    @x = x
-    @y = y
-    @instruction = instruction
-  end
-end
+
 
 class Robot
   attr_accessor :direction, :positions, :adjacent_positions
@@ -31,49 +24,6 @@ class Robot
     @direction = direction
     @plateau = nil
     calculate_adjacent_positions
-  end
-
-  def calculate_adjacent_positions
-    #current_position = @positions.last
-    case @direction
-    when :NORTH 
-      front = x_y_minus_1                           #{x: current_position.x, y: current_position.y-1}
-      back = x_y_plus_1                             #{x: current_position.x, y: current_position.y+1}
-      left = x_minus_1_y                            #{x: current_position.x-1, y: current_position.y}
-      right = x_plus_1_y                            #{x: current_position.x+1, y: current_position.y} 
-    when :EAST
-      front = x_plus_1_y                            #{x: current_position.x+1, y: current_position.y}
-      back = x_minus_1_y                            #{x: current_position.x-1, y: current_position.y}
-      left = x_y_minus_1                            #{x: current_position.x, y: current_position.y-1}
-      right = x_y_plus_1                            #{x: current_position.x, y: current_position.y+1} 
-    when :SOUTH
-      front = x_y_plus_1                            #{x: current_position.x, y: current_position.y+1}
-      back = x_y_minus_1                            #{x: current_position.x, y: current_position.y-1}
-      left = x_plus_1_y                             #{x: current_position.x+1, y: current_position.y}
-      right = x_minus_1_y                           #{x: current_position.x-1, y: current_position.y} 
-    when :WEST
-      front = x_minus_1_y                           #{x: current_position.x-1, y: current_position.y}
-      back = x_plus_1_y                             #{x: current_position.x+1, y: current_position.y}
-      left = x_y_plus_1                             #{x: current_position.x, y: current_position.y+1}
-      right = x_y_minus_1                           #{x: current_position.x, y: current_position.y-1} 
-    end
-    @adjacent_positions = {front: front, right: right, back: back, left: left}
-  end
-
-  def x_y_minus_1
-    {x: @positions.last.x, y: @positions.last.y-1}
-  end
-
-  def x_y_plus_1
-    {x: @positions.last.x, y: @positions.last.y+1}
-  end
-
-  def x_minus_1_y
-    {x: @positions.last.x-1, y: @positions.last.y}
-  end
-
-  def x_plus_1_y
-    {x: @positions.last.x+1, y: @positions.last.y}
   end
 
   def get_position
